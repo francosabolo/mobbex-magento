@@ -1,20 +1,12 @@
 <?php
-
 class Mobbex_Mobbex_Model_Observer
 {
-	/** @var Mobbex_Mobbex_Helper_Settings */
-	public $settings;
-
     /** Flag to stop observer executing more than once */
     static protected $_singletonFlag = false;
 
-	public function __construct() {
-		$this->settings	= Mage::helper('mobbex/settings');
-	}
-
 	/**
 	 * Add a new tab in the backoffice category page.
-	 * 
+	 *
 	 * @param Varien_Event_Observer $observer
 	 */
 	public function newTabCategory($observer)
@@ -46,7 +38,7 @@ class Mobbex_Mobbex_Model_Observer
 		if (empty($id))
 			return;
 
-		$this->settings->savePlanFields($id);
+		Mage::getModel('mobbex/plans')->savePlanFields($id);
 	}
 
 	public function saveCategoryTabData()
@@ -61,7 +53,7 @@ class Mobbex_Mobbex_Model_Observer
 		if (empty($id))
 			return;
 
-		$this->settings->savePlanFields($id, 'category');
+		Mage::getModel('mobbex/plans')->savePlanFields($id, 'category');
 	}
 
 	/**
@@ -95,7 +87,7 @@ class Mobbex_Mobbex_Model_Observer
 			if($data){
 				$payment = $order->getPayment();
 				$transactionId = $payment->getData('last_trans_id');
-				$amount = $creditmemo->getData('grand_total');	
+				$amount = $creditmemo->getData('grand_total');
 				$result = $this->sendRefund($transactionId,$amount);
 			}
 
@@ -129,13 +121,13 @@ class Mobbex_Mobbex_Model_Observer
 
 		$response = curl_exec($curl);
 		$err = curl_error($curl);
-		
+
 		curl_close($curl);
 
 		if ($err) {
             return false;
         } else {
-			$result = json_decode($response['body']);	
+			$result = json_decode($response['body']);
 			if ($result->result) {
 				return true;
 			} else {

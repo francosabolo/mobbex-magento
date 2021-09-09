@@ -6,8 +6,8 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 	/**
 	* All 'ahora' plan keys.
 	*/
-	public static $ahora = ['ahora_3', 'ahora_6', 'ahora_12', 'ahora_18'];
-	
+	const AHORA_PLANS = ['ahora_3', 'ahora_6', 'ahora_12', 'ahora_18'];
+
 	/** @var Mobbex_Mobbex_Model_Customfield */
 	public $fields;
 
@@ -29,7 +29,7 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 	}
 
 	public function getModuleUrl($action, $queryParams) {
-		return Mage::getUrl('mobbex/payment/' . $action, array('_secure' => true, '_query' => $queryParams)); 
+		return Mage::getUrl('mobbex/payment/' . $action, array('_secure' => true, '_query' => $queryParams));
 	}
 
 	public function getReference($order)
@@ -49,7 +49,7 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 	{
 		$installments = $allCommonPlans = $allAdvancedPlans = [];
 
-		foreach (self::$ahora as $ahoraPlan) {
+		foreach (self::AHORA_PLANS as $ahoraPlan) {
 			// Get 'ahora' plans from categories
 			foreach ($this->getAllCategories($products) as $catId) {
 				// If category has plan selected
@@ -115,7 +115,7 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 	 */
 	private function getAllCategories($listProducts)
 	{
-		
+
 		$categories_id = array();
 		foreach ($listProducts as $product) {
 			//Search for the product object
@@ -135,21 +135,21 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
     {
 		// Init Curl
 		$curl = curl_init();
-		
+
         // Create an unique id
 		$tracking_ref = $this->getReference($order);
-		
+
 		$items = array();
 		$products = $order->getAllItems();
-		
+
         foreach($products as $product) {
 			$prd = Mage::helper('catalog/product')->getProduct($product->getId(), null, null);
 
             $items[] = array(
-				"image" => (string)Mage::helper('catalog/image')->init($prd, 'image')->resize(150), 
-				"description" => $product->getName(), 
-				"quantity" => $product->getQtyOrdered(), 
-				"total" => round($product->getPrice(),2) 
+				"image" => (string)Mage::helper('catalog/image')->init($prd, 'image')->resize(150),
+				"description" => $product->getName(),
+				"quantity" => $product->getQtyOrdered(),
+				"total" => round($product->getPrice(),2)
 			);
 		}
 
@@ -197,7 +197,7 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 				'embed' => true,
 				'domain' => $domain,
                 'theme' => [
-					'type' => 'light', 
+					'type' => 'light',
 					'colors' => null
 				],
 				'platform' => $this->getPlatform(),
@@ -220,17 +220,17 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 			CURLOPT_POSTFIELDS => json_encode($data),
 			CURLOPT_HTTPHEADER => $headers
 		]);
-		
+
         $response = curl_exec($curl);
 		$err = curl_error($curl);
-		
+
 		curl_close($curl);
-		
+
         if ($err) {
             d("cURL Error #:" . $err);
         } else {
 			$res = json_decode($response, true);
-			
+
 			if($res['data']) {
 				$res['data']['return_url'] = $return_url;
 				return $res['data'];
@@ -292,14 +292,14 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 				$cuit = $res['data']['tax_id'];
 			}
         }
-        return $cuit; 
+        return $cuit;
     }
 
 	/**
 	 * Get sources with common plans from mobbex.
-	 * 
+	 *
 	 * @param null|int $total
-	 * 
+	 *
 	 * @return array
 	 */
 	public function getSources($total = null)
@@ -338,13 +338,14 @@ class Mobbex_Mobbex_Helper_Data extends Mage_Core_Helper_Abstract
 		return [];
 	}
 
-	/**
-	 * Get sources with advanced rule plans from mobbex.
-	 * 
-	 * @param string $rule
-	 * 
-	 * @return array
-	 */
+    /**
+     * Get sources with advanced rule plans from mobbex.
+     *
+     * @param string $rule
+     *
+     * @return array
+     * @throws Mage_Core_Exception
+     */
 	public function getSourcesAdvanced($rule = 'externalMatch')
 	{
 		$curl = curl_init();

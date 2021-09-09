@@ -1,7 +1,7 @@
 <?php
 class Mobbex_Mobbex_Model_Standard extends Mage_Payment_Model_Method_Abstract {
 	protected $_code = 'mobbex';
-	
+
 	protected $_isInitializeNeeded      = true;
 	protected $_canUseInternal          = true;
 	protected $_canUseForMultishipping  = false;
@@ -11,7 +11,7 @@ class Mobbex_Mobbex_Model_Standard extends Mage_Payment_Model_Method_Abstract {
     protected $_canCapture = true;
 	protected $_canRefund = true;
 
-	
+
 	public function getOrderPlaceRedirectUrl() {
 		$embed = Mage::getStoreConfig('payment/mobbex/embed');
         if (!$embed) {
@@ -21,4 +21,3 @@ class Mobbex_Mobbex_Model_Standard extends Mage_Payment_Model_Method_Abstract {
 		}
 	}
 }
-?>
